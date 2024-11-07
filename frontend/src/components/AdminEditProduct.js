@@ -11,12 +11,15 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
     const [data, setData] = useState({
         ...productData,
         productImage: productData?.productImage || [],
+        quantityOptions: productData?.quantityOptions || []  // Initialize quantity options
     });
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
     const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
     const [fullScreenImage, setFullScreenImage] = useState("");
+    const [newQuantityOption, setNewQuantityOption] = useState({ quantity: '', price: '' });
 
+    // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
             const response = await fetch(SummaryApi.Category.url, {
@@ -38,6 +41,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
         fetchCategories();
     }, []);
 
+    // Fetch subcategories when category changes
     useEffect(() => {
         const fetchSubcategories = async () => {
             if (data.category) {
@@ -62,13 +66,14 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                     toast.error("Failed to fetch subcategories.");
                 }
             } else {
-                setSubcategories([]); // Clear subcategories if no category is selected
+                setSubcategories([]);
             }
         };
 
         fetchSubcategories();
     }, [data.category]);
 
+    // Handle field changes
     const handleOnChange = (e) => {
         const { name, value } = e.target;
         setData((prev) => ({
@@ -77,6 +82,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
         }));
     };
 
+    // Handle image upload
     const handleUploadProduct = async (e) => {
         const file = e.target.files[0];
         const uploadImageCloudinary = await uploadImage(file);
@@ -87,6 +93,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
         }));
     };
 
+    // Handle deleting product image
     const handleDeleteProductImage = (index) => {
         const newProductImage = [...data.productImage];
         newProductImage.splice(index, 1);
@@ -96,16 +103,40 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
         }));
     };
 
+    // Add a new quantity option
+    const handleAddQuantityOption = () => {
+        if (newQuantityOption.quantity && newQuantityOption.price) {
+            setData((prev) => ({
+                ...prev,
+                quantityOptions: [...prev.quantityOptions, newQuantityOption]
+            }));
+            setNewQuantityOption({ quantity: '', price: '' });  // Reset input fields
+        } else {
+            toast.error("Both quantity and price are required.");
+        }
+    };
+
+    // Delete a quantity option
+    const handleDeleteQuantityOption = (index) => {
+        const updatedOptions = [...data.quantityOptions];
+        updatedOptions.splice(index, 1);
+        setData((prev) => ({
+            ...prev,
+            quantityOptions: updatedOptions
+        }));
+    };
+
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const categoryId = categories.find(cat => cat.name === data.category)?._id; // Get the ID of the selected category
-        const subcategoryId = data.subcategory; // Get the selected subcategory ID directly
+        const categoryId = categories.find(cat => cat.name === data.category)?._id;
+        const subcategoryId = data.subcategory;
 
         const updatedData = {
             ...data,
-            categoryId, // Use the category ID instead of name
-            subcategoryId // Add subcategory ID
+            categoryId,
+            subcategoryId
         };
 
         const response = await fetch(SummaryApi.updateProduct.url, {
@@ -114,7 +145,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
             headers: {
                 "content-type": "application/json"
             },
-            body: JSON.stringify(updatedData) // Use updated data with category ID and subcategory ID
+            body: JSON.stringify(updatedData)
         });
 
         const responseData = await response.json();
@@ -139,6 +170,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                 </div>
 
                 <form className='grid p-4 gap-2 overflow-y-scroll h-full pb-5' onSubmit={handleSubmit}>
+                    {/* Product Name */}
                     <label htmlFor='productName'>Product Name :</label>
                     <input
                         type='text'
@@ -151,6 +183,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         required
                     />
 
+                    {/* Brand Name */}
                     <label htmlFor='brandName' className='mt-3'>Brand Name :</label>
                     <input
                         type='text'
@@ -163,6 +196,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         required
                     />
 
+                    {/* Category */}
                     <label htmlFor='category' className='mt-3'>Category :</label>
                     <select required value={data.category} name='category' onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'>
                         <option value="">Select Category</option>
@@ -171,6 +205,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         ))}
                     </select>
 
+                    {/* Subcategory */}
                     <label htmlFor='subcategory' className='mt-3'>Subcategory :</label>
                     <select required value={data.subcategory} name='subcategory' onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'>
                         <option value="">Select Subcategory</option>
@@ -179,6 +214,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         ))}
                     </select>
 
+                    {/* Product Images */}
                     <label htmlFor='productImage' className='mt-3'>Product Image :</label>
                     <label htmlFor='uploadImageInput'>
                         <div className='p-2 bg-slate-100 border rounded h-32 w-full flex justify-center items-center cursor-pointer'>
@@ -190,6 +226,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         </div>
                     </label>
 
+                    {/* Display Images */}
                     <div>
                         {data.productImage.length > 0 ? (
                             <div className='flex items-center gap-2'>
@@ -217,6 +254,44 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         )}
                     </div>
 
+                    {/* Quantity Options */}
+                    <label htmlFor='quantityOptions' className='mt-3'>Quantity Options :</label>
+                    <div className='flex gap-2'>
+                        <input
+                            type='number'
+                            value={newQuantityOption.quantity}
+                            placeholder='Quantity'
+                            onChange={(e) => setNewQuantityOption({ ...newQuantityOption, quantity: e.target.value })}
+                            className='p-2 bg-slate-100 border rounded'
+                        />
+                        <input
+                            type='number'
+                            value={newQuantityOption.price}
+                            placeholder='Price'
+                            onChange={(e) => setNewQuantityOption({ ...newQuantityOption, price: e.target.value })}
+                            className='p-2 bg-slate-100 border rounded'
+                        />
+                        <button type='button' onClick={handleAddQuantityOption} className='p-2 bg-green-600 text-white rounded'>
+                            Add Option
+                        </button>
+                    </div>
+
+                    <div>
+                        {data.quantityOptions.length > 0 ? (
+                            <div className='mt-2'>
+                                {data.quantityOptions.map((option, index) => (
+                                    <div key={index} className='flex justify-between items-center bg-slate-100 p-2 mb-2 rounded'>
+                                        <p>Qty: {option.quantity}, Price: {option.price}</p>
+                                        <MdDelete className='text-red-600 cursor-pointer' onClick={() => handleDeleteQuantityOption(index)} />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className='text-red-600 text-xs'>*Please add at least one quantity option</p>
+                        )}
+                    </div>
+
+                    {/* Price */}
                     <label htmlFor='price' className='mt-3'>Price :</label>
                     <input
                         type='number'
@@ -229,18 +304,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         required
                     />
 
-                    <label htmlFor='sellingPrice' className='mt-3'>Selling Price :</label>
-                    <input
-                        type='number'
-                        id='sellingPrice'
-                        placeholder='Enter selling price'
-                        value={data.sellingPrice}
-                        name='sellingPrice'
-                        onChange={handleOnChange}
-                        className='p-2 bg-slate-100 border rounded'
-                        required
-                    />
-
+                    {/* Description */}
                     <label htmlFor='description' className='mt-3'>Description :</label>
                     <textarea
                         className='h-28 bg-slate-100 border resize-none p-1'
@@ -251,7 +315,9 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         value={data.description}
                     />
 
-                    <button className='px-3 py-2 bg-red-600 text-white mb-10 hover:bg-red-700'>Update Product</button>
+                    <button type='submit' className='px-3 py-2 bg-red-600 text-white mb-10 hover:bg-red-700'>
+                        Update Product
+                    </button>
                 </form>
 
                 {openFullScreenImage && (
