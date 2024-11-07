@@ -7,7 +7,9 @@ import SummaryApi from '../common';
 
 const AdminProductCard = ({ data, fetchdata }) => {
     const [editProduct, setEditProduct] = useState(false);
+    const [selectedQuantity, setSelectedQuantity] = useState(""); // For tracking selected quantity option
 
+    // Handle deletion of product
     const handleDeleteProduct = async () => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
@@ -39,6 +41,11 @@ const AdminProductCard = ({ data, fetchdata }) => {
         }
     };
 
+    // Handle quantity option change
+    const handleQuantityChange = (e) => {
+        setSelectedQuantity(e.target.value);
+    };
+
     return (
         <div className='bg-white p-4 rounded'>
             <div className='w-40'>
@@ -47,10 +54,29 @@ const AdminProductCard = ({ data, fetchdata }) => {
                 </div>
                 <h1 className='text-ellipsis line-clamp-2'>{data.productName}</h1>
                 <div>
-                    <p className='font-semibold'>
-                        {displayINRCurrency(data.sellingPrice)}
-                    </p>
-                    <div className='flex justify-between'>
+                    {/* Display the selling price */}
+                   
+
+                    {/* Quantity Dropdown */}
+                    {data.quantityOptions && data.quantityOptions.length > 0 && (
+                        <div className='mt-2'>
+                            <label htmlFor="quantityOptions" className="block text-sm font-semibold">Quantity:</label>
+                            <select
+                                value={selectedQuantity}
+                                onChange={handleQuantityChange}
+                                className="p-2 bg-slate-100 border rounded w-full"
+                            >
+                                <option value="">--Quantity --</option>
+                                {data.quantityOptions.map((option, index) => (
+                                    <option key={index} value={option.quantity}>
+                                        {option.quantity} for {displayINRCurrency(option.price)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    <div className='flex justify-between mt-3'>
                         <button className='text-green-500' onClick={() => setEditProduct(!editProduct)}>
                             <MdModeEditOutline />
                         </button>
@@ -60,6 +86,8 @@ const AdminProductCard = ({ data, fetchdata }) => {
                     </div>
                 </div>
             </div>
+
+            {/* If editProduct is true, show AdminEditProduct component */}
             {editProduct && (
                 <AdminEditProduct 
                     onClose={() => setEditProduct(false)} 
