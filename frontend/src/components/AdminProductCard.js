@@ -46,6 +46,9 @@ const AdminProductCard = ({ data, fetchdata }) => {
         setSelectedQuantity(e.target.value);
     };
 
+    // Get the selected quantity price
+    const selectedOption = data.quantityOptions?.find(option => option.quantity === selectedQuantity);
+
     return (
         <div className='bg-white p-4 rounded'>
             <div className='w-40'>
@@ -54,9 +57,11 @@ const AdminProductCard = ({ data, fetchdata }) => {
                 </div>
                 <h1 className='text-ellipsis line-clamp-2'>{data.productName}</h1>
                 <div>
-                    {/* Display the selling price */}
-                   
-
+                    {/* Display the base price (MRP) with a strike-through */}
+                    <div className='text-red-500 line-through'>
+                        <p className='font-semibold'>{displayINRCurrency(data.price)}</p>
+                    </div>
+                    
                     {/* Quantity Dropdown */}
                     {data.quantityOptions && data.quantityOptions.length > 0 && (
                         <div className='mt-2'>
@@ -66,13 +71,22 @@ const AdminProductCard = ({ data, fetchdata }) => {
                                 onChange={handleQuantityChange}
                                 className="p-2 bg-slate-100 border rounded w-full"
                             >
-                                <option value="">--Quantity --</option>
+                                <option value="">--Select Quantity--</option>
                                 {data.quantityOptions.map((option, index) => (
                                     <option key={index} value={option.quantity}>
                                         {option.quantity} for {displayINRCurrency(option.price)}
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                    )}
+
+                    {/* Display the discounted price for the selected quantity */}
+                    {selectedQuantity && selectedOption && (
+                        <div className='mt-2'>
+                            <p className='font-semibold text-green-500'>
+                                Price for {selectedQuantity} items: {displayINRCurrency(selectedOption.price)}
+                            </p>
                         </div>
                     )}
 
@@ -89,10 +103,10 @@ const AdminProductCard = ({ data, fetchdata }) => {
 
             {/* If editProduct is true, show AdminEditProduct component */}
             {editProduct && (
-                <AdminEditProduct 
-                    onClose={() => setEditProduct(false)} 
-                    productData={data} 
-                    fetchdata={fetchdata} 
+                <AdminEditProduct
+                    onClose={() => setEditProduct(false)}
+                    productData={data}
+                    fetchdata={fetchdata}
                 />
             )}
         </div>
