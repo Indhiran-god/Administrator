@@ -11,7 +11,6 @@ import Bills from '../pages/Bills';
 import Allsub from "../pages/Allsub"
 const router = createBrowserRouter([
     {
-        
         path: "*", // This will match all paths
         element: <App />, // Main app component
         children: [
