@@ -39,6 +39,7 @@ const AdminPanel = () => {
                         <Link to={"all-users"} className='px-2 py-1 hover:bg-slate-100'>All Users</Link>
                         <Link to={"all-products"} className='px-2 py-1 hover:bg-slate-100'>All product</Link>
                         <Link to={"all-sub"} className='px-2 py-1 hover:bg-slate-100'>All subcategory</Link>
+                        <Link to={"all-category"} className='px-2 py-1 hover:bg-slate-100'>All category</Link>
                         <Link to={"all-orders"} className='px-2 py-1 hover:bg-slate-100'>All orders</Link>
                         <Link to={"bill"} className='px-2 py-1 hover:bg-slate-100'>Bills</Link>
                     </nav>
