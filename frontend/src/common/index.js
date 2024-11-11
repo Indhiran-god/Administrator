@@ -1,5 +1,4 @@
 const backendDomin = process.env.REACT_APP_BACKEND_URL
-
 const SummaryApi = {
     signUP: {
         url: `${backendDomin}/api/signup`,
@@ -18,58 +17,57 @@ const SummaryApi = {
         method: 'get'
     },
     update_user: {
-        url: `${backendDomin}/api/update-user`,
-        method: 'put'
+        url: `${backendDomin}/api/update-user`, // Changed to match the correct endpoint
+        method: 'put' 
     },
-    productDetails: {
-        url: `${backendDomin}/api/product-details`,
-        method: 'post'
-    },
-    allUser: {
-        url: `${backendDomin}/api/all-user`,
+    getProductDetails: (productId) => ({ // Updated to take productId as a parameter
+        url: `${backendDomin}/api/product-details/${productId}`, // Use productId in URL
         method: 'get'
-    },
+    }),
     updateUser: {
         url: `${backendDomin}/api/update-user`,
         method: "post"
-    },
-    uploadProduct: {
-        url: `${backendDomin}/api/upload-product`,
-        method: "post"
-    },
-    updateProduct: {
-        url: `${backendDomin}/api/update-product`,
-        method: 'PUT'
-    },
-    allProduct: {
-        url: `${backendDomin}/api/get-product`,
-        method: 'get'
     },
     Category: {
         url: `${backendDomin}/api/Category`,
         method: 'get'
     },
-    deleteProduct: (productId) => ({
-        url: `${backendDomin}/api/delete-product/${productId}`,
-        method: 'delete'
-    }),
-    deleteSubcategory: (subcategoryId) => ({
-        url: `${backendDomin}/api/delete-subcategory/${subcategoryId}`,
-        method: 'DELETE'
-    }),
-    
     getSubcategories: (categoryName) => ({
-        url: `${backendDomin}/api/category/${categoryName}/subcategories`,
+        url: `${backendDomin}/api/category/${categoryName}/subcategories`, // Use categoryName in URL
         method: 'get'
     }),
-    getAllSubcategories: {
-        url: `${backendDomin}/api/subcategories`,
+    getProducts: (subcategoryId) => ({ // Fixed the method to return an object
+        url: `${backendDomin}/api/subcategories/${subcategoryId}/products`, // Use subcategoryId in URL
+        method: 'get'
+    }),
+    addToCartProduct: {
+        url: `${backendDomin}/api/addtocart`,
+        method: 'post'
+    },
+    addToCartProductCount: {
+        url: `${backendDomin}/api/countAddToCartProduct`,
         method: 'get'
     },
-    addSubcategory: {
-        url: `${backendDomin}/api/add-subcategories/:categoryId`,
-        method: 'POST',
+    addToCartProductView: {
+        url: `${backendDomin}/api/view-card-product`,
+        method: 'get'
     },
+    updateCartProduct: {
+        url: `${backendDomin}/api/update-cart-product`,
+        method: 'post'
+    },
+    deleteCartProduct: {
+        url: `${backendDomin}/api/delete-cart-product`,
+        method: 'post'
+    },
+    searchProduct : {
+        url : `${backendDomin}/api/search`,
+        method : 'get'
+    },
+    getRelatedProducts: (subcategoryId) => ({ // New method for related products
+        url: `${backendDomin}/api/related/${subcategoryId}`, // Use subcategoryId in URL
+        method: 'get'
+    }),
 };
 
 export default SummaryApi;
