@@ -5,6 +5,7 @@ import Login from '../pages/Login';
 import AdminPanel from '../pages/AdminPanel';
 import AllUsers from "../pages/AllUsers"; 
 import Allproducts from '../pages/Allproducts'; 
+import Allcategory from '../pages/AllCategory';
 import Allorders from '../pages/Allorders'; 
 import Bills from '../pages/Bills'; 
 import Allsub from "../pages/Allsub"
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
                         element: <Allproducts />
                     },
                     {
+                        path: "all-category", // Admin: All products
+                        element: <Allcategory />
+                    },
+                    {
                         path: "all-orders", // Admin: All orders
                         element: <Allorders />
                     },
@@ -52,3 +57,4 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+
