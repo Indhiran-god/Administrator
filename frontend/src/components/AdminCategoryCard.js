@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
 import AdminEditCategory from './AdminEditCategory'; // Import the Edit Category Component
@@ -39,10 +39,6 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
         }
     };
 
-    const handleEditCategory = () => {
-        setIsEditing(true); // Open the edit modal
-    };
-
     const handleCloseEdit = () => {
         setIsEditing(false); // Close the edit modal
     };
@@ -80,13 +76,7 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
                 </h1>
             </div>
 
-            <div className='flex justify-between mt-2'>
-                <button
-                    className='text-blue-500'
-                    onClick={handleEditCategory}
-                >
-                    <MdEdit />
-                </button>
+            <div className='flex justify-end mt-2'>
                 <MdDelete
                     className='text-red-500 cursor-pointer'
                     onClick={handleDeleteCategory} // Delete function directly on the icon
