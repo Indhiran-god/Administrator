@@ -39,7 +39,7 @@ const SummaryApi = {
   },
   updateProduct: {
     url: `${backendDomin}/api/update-product`,
-    method: "PUT",
+    method: "put",
   },
   allProduct: {
     url: `${backendDomin}/api/get-product`,
@@ -55,7 +55,11 @@ const SummaryApi = {
   }),
   deleteSubcategory: (subcategoryId) => ({
     url: `${backendDomin}/api/delete-subcategory/${subcategoryId}`,
-    method: "DELETE",
+    method: "delete",
+  }),
+  deleteCategory: (categoryId) => ({
+    url: `${backendDomin}/api/delete-category/${categoryId}`,
+    method: "delete",
   }),
   getSubcategories: (categoryName) => ({
     url: `${backendDomin}/api/category/${categoryName}/subcategories`,
@@ -65,19 +69,18 @@ const SummaryApi = {
     url: `${backendDomin}/api/subcategories`,
     method: "get",
   },
-  addSubcategory: {
-    url: `${backendDomin}/api/add-subcategories/:categoryId`,
-    method: "POST",
-  },
+  addSubcategory: (categoryId) => ({
+    url: `${backendDomin}/api/add-subcategories/${categoryId}`,
+    method: "post",
+  }),
   addCategory: {
     url: `${backendDomin}/api/addCategory`,
-    method: "POST",
+    method: "post",
   },
-  // Updated to a function
   updateCategory: (categoryId, categoryData) => ({
     url: `${backendDomin}/api/categories/${categoryId}`,
-    method: "PUT", // Assuming PUT method for updating category
-    body: categoryData, // Pass the updated category data
+    method: "put",
+    body: categoryData,
   }),
 };
 
