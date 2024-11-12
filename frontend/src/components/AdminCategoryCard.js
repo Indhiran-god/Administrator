@@ -87,12 +87,10 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
                 >
                     <MdEdit />
                 </button>
-                <button
-                    className='text-red-500'
-                    onClick={handleDeleteCategory}
-                >
-                    <MdDelete />
-                </button>
+                <MdDelete
+                    className='text-red-500 cursor-pointer'
+                    onClick={handleDeleteCategory} // Delete function directly on the icon
+                />
             </div>
 
             {isEditing && (
