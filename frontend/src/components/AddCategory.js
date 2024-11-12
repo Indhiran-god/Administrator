@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import SummaryApi from '../common';  // Import SummaryApi
 import uploadImage from '../helpers/uploadImage';  // Ensure correct import path
 
+
 const AddCategory = ({ onClose, fetchCategories }) => {
     const [data, setData] = useState({
         name: "",
