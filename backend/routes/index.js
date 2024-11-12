@@ -1,4 +1,3 @@
-// routes/api.js
 const express = require('express');
 const router = express.Router();
 const userSignUpController = require("../controller/userSignUp");
@@ -18,6 +17,9 @@ const addSubcategory = require('../controller/addSubcategory');
 const getAllSubcategories = require('../controller/getAllSubcategories');
 const getProductsBySubcategory = require('../controller/getProductsBySubcategory');
 const deleteSubcategory = require('../controller/deletesubcategory');
+const addCategory = require('../controller/addCategory');
+const updateCategoryController = require('../controller/updateCategoryController');
+const deleteCategory = require('../controller/deletecategory'); // Import deleteCategory controller
 
 // User routes
 router.post("/signup", userSignUpController); 
@@ -40,5 +42,8 @@ router.post('/add-subcategories/:categoryId', authToken, addSubcategory);
 router.get('/subcategories', getAllSubcategories);
 router.get('/subcategories/:subcategoryId/products', getProductsBySubcategory);
 router.delete('/delete-subcategory/:subcategoryId', authToken, deleteSubcategory);
+router.post('/addCategory', authToken, addCategory);
+router.put("/categories", authToken, updateCategoryController); 
+router.delete('/delete-category/:categoryId', authToken, deleteCategory); // Delete category route
 
 module.exports = router;
