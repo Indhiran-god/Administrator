@@ -258,7 +258,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                     <label htmlFor='quantityOptions' className='mt-3'>Quantity Options :</label>
                     <div className='flex gap-2'>
                         <input
-                            type='number'
+                        
                             value={newQuantityOption.quantity}
                             placeholder='Quantity'
                             onChange={(e) => setNewQuantityOption({ ...newQuantityOption, quantity: e.target.value })}
