@@ -85,7 +85,7 @@ const AdminProductCard = ({ data, fetchdata }) => {
                     {selectedQuantity && selectedOption && (
                         <div className='mt-2'>
                             <p className='font-semibold text-green-500'>
-                                Price for {selectedQuantity} items: {displayINRCurrency(selectedOption.price)}
+                                Price  {selectedQuantity} items: {displayINRCurrency(selectedOption.price)}
                             </p>
                         </div>
                     )}
