@@ -11,9 +11,14 @@ const AllSubcategories = () => {
   // Fetch all subcategories from the backend
   const fetchAllSubcategories = async () => {
     try {
-      const response = await fetch(SummaryApi.getAllSubcategories.url);
+      const response = await fetch(SummaryApi.getAllSubcategories.url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication if needed
+      });
 
-      // Check if the response is not OK
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -22,7 +27,7 @@ const AllSubcategories = () => {
       if (dataResponse.success) {
         setAllSubcategories(dataResponse.data || []);
       } else {
-        toast.error('Failed to fetch subcategories');
+        toast.error(dataResponse.message || 'Failed to fetch subcategories');
       }
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -73,3 +78,4 @@ const AllSubcategories = () => {
 };
 
 export default AllSubcategories;
+
