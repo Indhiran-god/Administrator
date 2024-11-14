@@ -49,7 +49,9 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
     // Check if images exist and are valid
     const images = data?.images || [];
     const fullImageUrls = images.map(imageUrl => 
-        imageUrl?.startsWith('http') ? imageUrl : `http://localhost:5000/${imageUrl}`
+        imageUrl?.startsWith('http') ? 
+        imageUrl.replace(/^http:\/\//, 'https://') : // Ensure external URLs use HTTPS
+        `https://localhost:5000/${imageUrl}` // Use HTTPS for local server as well
     );
 
     return (
