@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MdDelete } from "react-icons/md";
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
-import AdminEditCategory from './AdminEditCategory'; // Import the Edit Category Component
+import AdminEditCategory from './AdminEditCategory';
 
 const AdminCategoryCard = ({ data, fetchdata }) => {
     const [isEditing, setIsEditing] = useState(false); // State to handle editing
@@ -43,16 +43,16 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
         setIsEditing(false); // Close the edit modal
     };
 
-    // Log the image URLs to debug
-    console.log('Image Paths:', data?.images);
-
-    // Check if images exist and are valid
+    // Process image URLs to ensure they start with HTTPS
     const images = data?.images || [];
-    const fullImageUrls = images.map(imageUrl => 
-        imageUrl?.startsWith('http') ? 
-        imageUrl.replace(/^http:\/\//, 'https://') : // Ensure external URLs use HTTPS
-        `https://localhost:5000/${imageUrl}` // Use HTTPS for local server as well
-    );
+    const fullImageUrls = images.map(imageUrl => {
+        // Ensure Cloudinary images use HTTPS
+        if (imageUrl?.startsWith("http://res.cloudinary.com")) {
+            return imageUrl.replace("http://", "https://");
+        }
+        // If a relative path, use the base URL in environment variables for production
+        return `${process.env.REACT_APP_BASE_URL || ""}/${imageUrl}`;
+    });
 
     return (
         <div className='bg-white p-4 rounded shadow h-64 flex flex-col justify-between'>
