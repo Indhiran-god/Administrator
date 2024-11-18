@@ -1,4 +1,4 @@
-const backendDomin = process.env.REACT_APP_BACKEND_URL; // Ensure this is consistent
+const backendDomin = process.env.REACT_APP_BACKEND_URL; 
 
 const SummaryApi = {
   signUP: {
@@ -69,10 +69,10 @@ const SummaryApi = {
     url: `${backendDomin}/api/subcategories`,
     method: "get",
   },
-  addSubcategory: (categoryId) => ({
-    url: `${backendDomin}/api/add-subcategories/${categoryId}`,
+  addSubcategory: {
+    url: `${backendDomin}/api/add-subcategories`,
     method: "post",
-  }),
+},
   addCategory: {
     url: `${backendDomin}/api/addCategory`,
     method: "post",
