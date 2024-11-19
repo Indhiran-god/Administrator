@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
 import AdminEditCategory from './AdminEditCategory';
 
 const AdminCategoryCard = ({ data, fetchdata }) => {
-    const [isEditing, setIsEditing] = useState(false); // State to handle editing
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleDeleteCategory = async () => {
         if (window.confirm("Are you sure you want to delete this category?")) {
@@ -39,31 +39,26 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
         }
     };
 
-    const handleCloseEdit = () => {
-        setIsEditing(false); // Close the edit modal
+    const handleEditCategory = () => {
+        setIsEditing(true);
     };
 
-    // Process image URLs to ensure they start with HTTPS
+    const handleCloseEdit = () => {
+        setIsEditing(false);
+    };
+
     const images = data?.images || [];
-    const fullImageUrls = images.map(imageUrl => {
-        // Ensure Cloudinary images use HTTPS
-        if (imageUrl?.startsWith("http://res.cloudinary.com")) {
-            return imageUrl.replace("http://", "https://");
-        }
-        // If a relative path, use the base URL in environment variables for production
-        return `${process.env.REACT_APP_BASE_URL || ""}/${imageUrl}`;
-    });
 
     return (
         <div className='bg-white p-4 rounded shadow h-64 flex flex-col justify-between'>
             <div className='flex flex-col items-center flex-grow'>
                 {images.length > 0 ? (
                     <div className="grid grid-cols-2 gap-2 mb-2">
-                        {fullImageUrls.map((imageUrl, index) => (
+                        {images.map((imageUrl, index) => (
                             <img
                                 key={index}
-                                src={imageUrl} // Ensure it's the correct image URL
-                                alt={`Category Image ${index + 1}`}
+                                src={imageUrl} // Assuming imageUrl is now valid
+                                alt={`Category ${index + 1}`} // Simplified alt attribute
                                 className='w-24 h-24 object-cover rounded'
                             />
                         ))}
@@ -78,10 +73,16 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
                 </h1>
             </div>
 
-            <div className='flex justify-end mt-2'>
+            <div className='flex justify-between mt-2'>
+                <button
+                    className='text-blue-500'
+                    onClick={handleEditCategory}
+                >
+                    <MdEdit />
+                </button>
                 <MdDelete
                     className='text-red-500 cursor-pointer'
-                    onClick={handleDeleteCategory} // Delete function directly on the icon
+                    onClick={handleDeleteCategory}
                 />
             </div>
 
