@@ -1,15 +1,16 @@
-import React from 'react';
-import { MdDelete } from "react-icons/md";
+import React, { useState } from 'react';
+import { MdDelete, MdEdit } from "react-icons/md";
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
+import AdminEditSubcategory from './Admineditsubcategory'; // Import the Edit Subcategory Component
 
 const AdminSubcategoryCard = ({ data, fetchdata }) => {
+    const [isEditing, setIsEditing] = useState(false); // State to handle editing
+
     const handleDeleteSubcategory = async () => {
         if (window.confirm("Are you sure you want to delete this subcategory?")) {
             try {
                 const subcategoryId = data._id;
-
-                console.log('Deleting subcategory with ID:', subcategoryId);
 
                 if (!subcategoryId) {
                     toast.error('Invalid subcategory ID');
@@ -38,18 +39,41 @@ const AdminSubcategoryCard = ({ data, fetchdata }) => {
         }
     };
 
+    const handleEditSubcategory = () => {
+        setIsEditing(true); // Open the edit modal
+    };
+
+    const handleCloseEdit = () => {
+        setIsEditing(false); // Close the edit modal
+    };
+
+    const images = data?.image || []; // Array of images
+
     return (
-        <div className='bg-white p-4 rounded shadow h-64 flex flex-col justify-between'> {/* Fixed height */}
+        <div className='bg-white p-4 rounded shadow h-64 flex flex-col justify-between'>
             <div className='flex flex-col items-center flex-grow'>
-                {data?.image && data.image.length > 0 ? (
-                    <img
-                        src={data.image[0]}
-                        alt={data.name || 'Unnamed Subcategory'}
-                        className='w-32 h-32 object-cover rounded mb-2' // Fixed width and height for image
-                    />
+                {images.length > 0 ? (
+                    <div
+                        className={`grid ${
+                            images.length === 1
+                                ? 'grid-cols-1'
+                                : images.length === 2
+                                ? 'grid-cols-2'
+                                : 'grid-cols-2 gap-2'
+                        } mb-2`}
+                    >
+                        {images.map((imageUrl, index) => (
+                            <img
+                                key={index}
+                                src={imageUrl}
+                                alt={`Subcategory ${index + 1}`}
+                                className='w-24 h-24 object-cover rounded'
+                            />
+                        ))}
+                    </div>
                 ) : (
                     <div className='w-32 h-32 bg-gray-200 rounded mb-2 flex items-center justify-center'>
-                        <span>No Image</span>
+                        <span>No Image Available</span>
                     </div>
                 )}
                 <h1 className='font-bold text-lg text-center flex-grow overflow-hidden text-ellipsis whitespace-nowrap'>
@@ -59,12 +83,26 @@ const AdminSubcategoryCard = ({ data, fetchdata }) => {
 
             <div className='flex justify-between mt-2'>
                 <button
+                    className='text-blue-500'
+                    onClick={handleEditSubcategory}
+                >
+                    <MdEdit />
+                </button>
+                <button
                     className='text-red-500'
                     onClick={handleDeleteSubcategory}
                 >
                     <MdDelete />
                 </button>
             </div>
+
+            {isEditing && (
+                <AdminEditSubcategory
+                    onClose={handleCloseEdit}
+                    subcategoryData={data}
+                    fetchdata={fetchdata}
+                />
+            )}
         </div>
     );
 };
