@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { CgClose } from "react-icons/cg";
 import { toast } from 'react-toastify';
-import SummaryApi from '../common';  // Import SummaryApi
-import uploadImage from '../helpers/uploadImage';  // Ensure correct import path
-
+import SummaryApi from '../common';  // Import your API configuration
+import uploadImage from '../helpers/uploadImage';  // Ensure this points to the correct upload image helper
 
 const AddCategory = ({ onClose, fetchCategories }) => {
     const [data, setData] = useState({
@@ -23,7 +22,8 @@ const AddCategory = ({ onClose, fetchCategories }) => {
         try {
             // Assuming uploadImage is a function that returns the uploaded image URL
             const imageUrls = await Promise.all(files.map(file => uploadImage(file)));
-            const newImageUrls = imageUrls.map(image => image.url);  // Extract URLs
+            
+            const newImageUrls = imageUrls.map(image => image.url);  // Extract URLs from the upload response
             setData((prev) => ({
                 ...prev,
                 categoryImages: [...prev.categoryImages, ...newImageUrls] // Add new images to the array
