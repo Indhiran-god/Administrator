@@ -47,41 +47,63 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
         setIsEditing(false);
     };
 
-    const images = data?.images || [];
+    const categoryImages = data?.categoryImage || [];
+
+    // Function to determine the grid layout based on the number of images
+    const getGridClasses = () => {
+        switch (categoryImages.length) {
+            case 1:
+                return 'grid-cols-1';
+            case 2:
+                return 'grid-cols-2';
+            case 3:
+                return 'grid-cols-2 gap-x-2'; // Two images in the first row, one in the second
+            case 4:
+                return 'grid-cols-2 gap-x-2 gap-y-2'; // Two images in each row
+            default:
+                return 'grid-cols-1';
+        }
+    };
+
+    // Disable scroll when modal is open
+    if (isEditing) {
+        document.body.style.overflow = 'hidden'; // Disable body scroll
+    } else {
+        document.body.style.overflow = 'auto'; // Enable body scroll
+    }
 
     return (
-        <div className='bg-white p-4 rounded shadow h-64 flex flex-col justify-between'>
+        <div className='bg-white p-3 rounded shadow w-56 h-auto flex flex-col justify-between'>
             <div className='flex flex-col items-center flex-grow'>
-                {images.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                        {images.map((imageUrl, index) => (
-                            <img
-                                key={index}
-                                src={imageUrl} // Assuming imageUrl is now valid
-                                alt={`Category ${index + 1}`} // Simplified alt attribute
-                                className='w-24 h-24 object-cover rounded'
-                            />
+                {categoryImages.length > 0 ? (
+                    <div className={`grid ${getGridClasses()} gap-1 w-full`}>
+                        {categoryImages.map((image, index) => (
+                            <div key={index} className='relative w-full h-24'>
+                                <img
+                                    src={image}
+                                    alt={`Category ${index}`}
+                                    className='w-full h-full object-cover rounded'
+                                />
+                            </div>
                         ))}
                     </div>
                 ) : (
-                    <div className='w-32 h-32 bg-gray-200 rounded mb-2 flex items-center justify-center'>
-                        <span>No Image Available</span>
+                    <div className='w-full h-24 bg-gray-200 rounded mb-2 flex items-center justify-center'>
+                        <span>No images available</span>
                     </div>
                 )}
-                <h1 className='font-bold text-lg text-center flex-grow overflow-hidden text-ellipsis whitespace-nowrap'>
-                    {data?.name || 'Unnamed Category'}
-                </h1>
+                <h4 className='mt-2 font-semibold text-lg text-center'>{data?.name}</h4>
             </div>
 
-            <div className='flex justify-between mt-2'>
-                <button
-                    className='text-blue-500'
+            <div className="flex justify-between items-center mt-3">
+                <MdEdit
+                    size={20}
+                    className='text-green-500 cursor-pointer hover:text-green-700'
                     onClick={handleEditCategory}
-                >
-                    <MdEdit />
-                </button>
+                />
                 <MdDelete
-                    className='text-red-500 cursor-pointer'
+                    size={20}
+                    className='text-red-500 cursor-pointer hover:text-red-700'
                     onClick={handleDeleteCategory}
                 />
             </div>
@@ -90,7 +112,7 @@ const AdminCategoryCard = ({ data, fetchdata }) => {
                 <AdminEditCategory
                     onClose={handleCloseEdit}
                     categoryData={data}
-                    fetchdata={fetchdata}
+                    fetchCategories={fetchdata}
                 />
             )}
         </div>
