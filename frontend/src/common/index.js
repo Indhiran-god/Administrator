@@ -77,11 +77,15 @@ const SummaryApi = {
     url: `${backendDomin}/api/addCategory`,
     method: "post",
   },
-  updateCategory: (categoryId, categoryData) => ({
-    url: `${backendDomin}/api/categories/${categoryId}`,
+  updateCategory: {
+    url: `${backendDomin}/api/categories/:categoryId`,
     method: "put",
-    body: categoryData,
-  }),
+  },
+  updateSubcategory: {
+    url: `${backendDomin}/api/update-subcategory`,  // URL to update a subcategory
+    method: "put",
+},
+
 };
 
 export default SummaryApi;
