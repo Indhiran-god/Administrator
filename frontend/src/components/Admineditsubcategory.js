@@ -1,177 +1,187 @@
 import React, { useEffect, useState } from 'react';
-import { CgClose } from "react-icons/cg";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import uploadImage from '../helpers/uploadImage';
-import DisplayImage from './DisplayImage';
-import { MdDelete } from "react-icons/md";
-import SummaryApi from '../common';
 import { toast } from 'react-toastify';
+import SummaryApi from '../common';
+import uploadImage from '../helpers/uploadImage';
 
 const AdminEditSubcategory = ({ onClose, subcategoryData, fetchdata }) => {
-    const [data, setData] = useState({
-        ...subcategoryData,
-        subcategoryImage: subcategoryData?.subcategoryImage || [],
-    });
     const [categories, setCategories] = useState([]);
-    const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
-    const [fullScreenImage, setFullScreenImage] = useState("");
+    const [data, setData] = useState({
+        name: subcategoryData?.name || '',
+        categoryId: subcategoryData?.categoryId || '',
+        subcategoryImage: subcategoryData?.images || [], // Ensure the images are initialized properly
+    });
 
+    // Fetch categories on component mount
     useEffect(() => {
         const fetchCategories = async () => {
-            const response = await fetch(SummaryApi.Category.url, {
-                method: SummaryApi.Category.method,
-                credentials: 'include',
-                headers: {
-                    "content-type": "application/json"
-                }
-            });
+            try {
+                const response = await fetch(SummaryApi.Category.url, {
+                    method: SummaryApi.Category.method,
+                    credentials: 'include',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                });
 
-            const responseData = await response.json();
-            if (responseData.success) {
-                setCategories(responseData.data);
-            } else {
-                toast.error(responseData.message);
+                const responseData = await response.json();
+
+                if (responseData.success) {
+                    setCategories(responseData.data);
+                } else {
+                    toast.error(responseData.message);
+                }
+            } catch (error) {
+                toast.error('Failed to fetch categories.');
+                console.error(error);
             }
         };
 
         fetchCategories();
     }, []);
 
+    // Handle input field changes
     const handleOnChange = (e) => {
         const { name, value } = e.target;
         setData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
-    const handleUploadSubcategory = async (e) => {
+    // Handle image upload
+    const handleUploadSubcategoryImage = async (e) => {
         const file = e.target.files[0];
-        const uploadImageCloudinary = await uploadImage(file);
+        if (!file) return;
 
+        try {
+            const uploadedImage = await uploadImage(file); // Assume this function uploads the image and returns a URL
+            setData((prev) => ({
+                ...prev,
+                subcategoryImage: [...prev.subcategoryImage, uploadedImage.url], // Add the uploaded image URL to the array
+            }));
+            toast.success('Image uploaded successfully!');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            toast.error('Failed to upload image.');
+        }
+    };
+
+    // Handle image deletion
+    const handleDeleteImage = (index) => {
+        const updatedImages = data.subcategoryImage.filter((_, idx) => idx !== index);
         setData((prev) => ({
             ...prev,
-            subcategoryImage: [...prev.subcategoryImage, uploadImageCloudinary.url]
+            subcategoryImage: updatedImages,  // Correctly update the subcategoryImage array
         }));
     };
 
-    const handleDeleteSubcategoryImage = (index) => {
-        const newSubcategoryImage = [...data.subcategoryImage];
-        newSubcategoryImage.splice(index, 1);
-        setData((prev) => ({
-            ...prev,
-            subcategoryImage: newSubcategoryImage
-        }));
-    };
-
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const categoryId = categories.find(cat => cat.name === data.category)?._id; // Get the ID of the selected category
+        // Validate category selection
+        if (!data.categoryId) {
+            toast.error('Please select a category.');
+            return;
+        }
 
         const updatedData = {
-            ...data,
-            categoryId // Include category ID
+            subcategoryId: subcategoryData._id, // Send subcategory ID for updating
+            newCategoryId: data.categoryId, // Send newCategoryId
+            name: data.name, // Subcategory name
+            subcategoryImage: data.subcategoryImage, // Ensure images are included
         };
 
-        const response = await fetch(SummaryApi.updateSubcategory.url, {
-            method: SummaryApi.updateSubcategory.method,
-            credentials: 'include',
-            headers: {
-                "content-type": "application/json"
-            },
-            body: JSON.stringify(updatedData) // Use updated data
-        });
+        try {
+            const response = await fetch(SummaryApi.updateSubcategory.url, {
+                method: 'PUT',  // Use PUT method to update the subcategory
+                credentials: 'include',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(updatedData),
+            });
 
-        const responseData = await response.json();
+            const responseData = await response.json();
 
-        if (responseData.success) {
-            toast.success(responseData.message);
-            onClose();
-            fetchdata();
-        } else {
-            toast.error(responseData.message);
+            if (responseData.success) {
+                toast.success(responseData.message);
+                onClose();
+                fetchdata(); // Refresh the subcategory data
+            } else {
+                toast.error(responseData.message);
+            }
+        } catch (error) {
+            toast.error('An error occurred while updating the subcategory.');
+            console.error(error);
         }
     };
 
     return (
-        <div className='fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 right-0 bottom-0 flex justify-center items-center'>
-            <div className='bg-white p-4 rounded w-full max-w-2xl h-full max-h-[80%] overflow-hidden'>
+        <div className='fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 flex justify-center items-center'>
+            <div className='bg-white p-4 rounded w-full max-w-2xl'>
                 <div className='flex justify-between items-center pb-3'>
                     <h2 className='font-bold text-lg'>Edit Subcategory</h2>
-                    <div className='w-fit ml-auto text-2xl hover:text-red-600 cursor-pointer' onClick={onClose}>
-                        <CgClose />
-                    </div>
+                    <button onClick={onClose} className='text-2xl hover:text-red-600'>
+                        X
+                    </button>
                 </div>
-
-                <form className='grid p-4 gap-2 overflow-y-scroll h-full pb-5' onSubmit={handleSubmit}>
-                    <label htmlFor='subcategoryName'>Subcategory Name :</label>
+                <form onSubmit={handleSubmit} className='grid gap-4'>
+                    <label htmlFor='name'>Subcategory Name:</label>
                     <input
-                        type='text'
-                        id='subcategoryName'
-                        placeholder='Enter subcategory name'
-                        name='subcategoryName'
-                        value={data.subcategoryName}
+                        id='name'
+                        name='name'
+                        value={data.name}
                         onChange={handleOnChange}
-                        className='p-2 bg-slate-100 border rounded'
+                        className='border p-2 rounded'
                         required
                     />
-
-                    <label htmlFor='category' className='mt-3'>Category :</label>
-                    <select required value={data.category} name='category' onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'>
-                        <option value="">Select Category</option>
-                        {categories.map((el) => (
-                            <option value={el.name} key={el._id}>{el.name}</option>
+                    <label htmlFor='categoryId'>Category:</label>
+                    <select
+                        id='categoryId'
+                        name='categoryId'
+                        value={data.categoryId}
+                        onChange={handleOnChange}
+                        className='border p-2 rounded'
+                        required
+                    >
+                        <option value=''>Select Category</option>
+                        {categories.map((category) => (
+                            <option key={category._id} value={category._id}>
+                                {category.name}
+                            </option>
                         ))}
                     </select>
-
-                    <label htmlFor='subcategoryImage' className='mt-3'>Subcategory Image :</label>
-                    <label htmlFor='uploadImageInput'>
-                        <div className='p-2 bg-slate-100 border rounded h-32 w-full flex justify-center items-center cursor-pointer'>
-                            <div className='text-slate-500 flex justify-center items-center flex-col gap-2'>
-                                <span className='text-4xl'><FaCloudUploadAlt /></span>
-                                <p className='text-sm'>Upload Subcategory Image</p>
-                                <input type='file' id='uploadImageInput' className='hidden' onChange={handleUploadSubcategory} />
-                            </div>
+                    <label htmlFor='subcategoryImage'>Upload Images:</label>
+                    <input
+                        type='file'
+                        accept='image/*'
+                        onChange={handleUploadSubcategoryImage}
+                        className='border p-2 rounded'
+                    />
+                    {data.subcategoryImage.length > 0 && (
+                        <div className='flex gap-2'>
+                            {data.subcategoryImage.map((image, idx) => (
+                                <div key={idx} className='relative'>
+                                    <img src={image} alt='subcategory' className='w-20 h-20 object-cover' />
+                                    <button
+                                        type='button'
+                                        onClick={() => handleDeleteImage(idx)}
+                                        className='absolute top-0 right-0 text-white bg-red-600 rounded-full'
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                    </label>
-
-                    <div>
-                        {data.subcategoryImage.length > 0 ? (
-                            <div className='flex items-center gap-2'>
-                                {data.subcategoryImage.map((el, index) => (
-                                    <div className='relative group' key={index}>
-                                        <img
-                                            src={el}
-                                            alt={el}
-                                            width={80}
-                                            height={80}
-                                            className='bg-slate-100 border cursor-pointer'
-                                            onClick={() => {
-                                                setOpenFullScreenImage(true);
-                                                setFullScreenImage(el);
-                                            }}
-                                        />
-                                        <div className='absolute bottom-0 right-0 p-1 text-white bg-red-600 rounded-full hidden group-hover:block cursor-pointer' onClick={() => handleDeleteSubcategoryImage(index)}>
-                                            <MdDelete />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className='text-red-600 text-xs'>*Please upload subcategory image</p>
-                        )}
-                    </div>
-
-                    <button className='px-3 py-2 bg-green-600 text-white mb-10 hover:bg-green-700'>Update Subcategory</button>
+                    )}
+                    <button type='submit' className='bg-blue-500 text-white p-2 rounded'>
+                        Update Subcategory
+                    </button>
                 </form>
-
-                {openFullScreenImage && (
-                    <DisplayImage onClose={() => setOpenFullScreenImage(false)} imgUrl={fullScreenImage} />
-                )}
             </div>
         </div>
     );
-}
+};
 
 export default AdminEditSubcategory;
