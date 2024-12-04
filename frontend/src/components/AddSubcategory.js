@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { CgClose } from "react-icons/cg";
-import SummaryApi from '../common/index';
 import { toast } from 'react-toastify';
+import SummaryApi from '../common'; // Import your API configuration
+import uploadImage from '../helpers/uploadImage'; // Helper function for image uploads
 
 const AddSubcategory = ({ onClose, fetchCategories }) => {
     const [data, setData] = useState({
         name: "",
         categoryName: "",
-        subcategoryImages: []
+        subcategoryImages: [], // Store multiple images
     });
 
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         const loadCategories = async () => {
-            setLoading(true);
             try {
+                setLoading(true);
                 const response = await fetch(SummaryApi.Category.url, {
                     method: SummaryApi.Category.method,
                 });
@@ -25,49 +25,63 @@ const AddSubcategory = ({ onClose, fetchCategories }) => {
                 if (result.success) {
                     setCategories(result.data);
                 } else {
-                    setError(result.message || "Failed to fetch categories.");
+                    toast.error(result.message || "Failed to fetch categories.");
                 }
             } catch {
-                setError("Error fetching categories.");
+                toast.error("Error fetching categories.");
             } finally {
                 setLoading(false);
             }
         };
-
         loadCategories();
     }, []);
 
-    const handleChange = (e) => {
+    const handleOnChange = (e) => {
         const { name, value } = e.target;
         setData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (e) => {
+    const handleUploadImage = async (e) => {
         const files = Array.from(e.target.files);
-        setData((prev) => ({
-            ...prev,
-            subcategoryImages: files.map((file) => URL.createObjectURL(file)),
-        }));
+        try {
+            const imageUrls = await Promise.all(
+                files.map(async (file) => {
+                    try {
+                        const uploadedImage = await uploadImage(file);
+                        return uploadedImage.url;
+                    } catch (err) {
+                        toast.error(`Failed to upload ${file.name}`);
+                        throw err;
+                    }
+                })
+            );
+            setData((prev) => ({
+                ...prev,
+                subcategoryImages: [...prev.subcategoryImages, ...imageUrls],
+            }));
+        } catch {
+            toast.error("Some images failed to upload. Please try again.");
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!data.name || !data.categoryName) {
-            toast.error("Please fill in all required fields.");
+        if (!data.name || !data.categoryName || data.subcategoryImages.length === 0) {
+            toast.error("Please fill in all required fields and upload at least one image.");
             return;
         }
 
         const payload = {
             name: data.name,
             categoryName: data.categoryName,
-            image: data.subcategoryImages[0] || ""
+            images: data.subcategoryImages,
         };
 
         try {
             setLoading(true);
             const response = await fetch(SummaryApi.addSubcategory.url, {
-                method: SummaryApi.addSubcategory.method,
+                method: 'POST',
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -89,51 +103,58 @@ const AddSubcategory = ({ onClose, fetchCategories }) => {
     };
 
     return (
-        <div className='fixed w-full h-full bg-gray-200 bg-opacity-70 top-0 left-0 flex justify-center items-center'>
-            <div className='bg-white p-6 rounded-md shadow-md w-full max-w-md'>
-                <div className='flex justify-between items-center mb-4'>
-                    <h2 className='text-xl font-semibold'>Add Subcategory</h2>
-                    <button onClick={onClose} className='text-xl hover:text-red-500'>
+        <div className='fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 flex justify-center items-center'>
+            <div className='bg-white p-4 rounded w-full max-w-md overflow-hidden'>
+                <div className='flex justify-between items-center pb-3'>
+                    <h2 className='font-bold text-lg'>Add Subcategory</h2>
+                    <div className='text-2xl hover:text-red-600 cursor-pointer' onClick={onClose}>
                         <CgClose />
-                    </button>
+                    </div>
                 </div>
-                <form className='space-y-4' onSubmit={handleSubmit}>
-                    <div className="flex flex-col">
-                        <label className='font-medium mb-1'>Select Category:</label>
-                        <select
-                            name="categoryName"
-                            value={data.categoryName}
-                            onChange={handleChange}
-                            className='p-2 border rounded'
-                        >
-                            <option value="">Select Category</option>
-                            {categories.map((category) => (
-                                <option key={category._id} value={category.name}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+
+                <form className='grid p-4 gap-2' onSubmit={handleSubmit}>
+                    <label htmlFor='categoryName'>Select Category:</label>
+                    <select
+                        name="categoryName"
+                        value={data.categoryName}
+                        onChange={handleOnChange}
+                        required
+                        className='p-2 bg-slate-100 border rounded'
+                    >
+                        <option value="">Select Category</option>
+                        {categories.map((category) => (
+                            <option key={category._id} value={category.name}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label htmlFor='name'>Subcategory Name:</label>
+                    <input
+                        required
+                        type="text"
+                        name='name'
+                        value={data.name}
+                        onChange={handleOnChange}
+                        className='p-2 bg-slate-100 border rounded'
+                    />
+
+                    <label htmlFor='subcategoryImages'>Subcategory Images:</label>
+                    <input
+                        type="file"
+                        multiple
+                        onChange={handleUploadImage}
+                        className='p-2 bg-slate-100 border rounded'
+                    />
+
+                    <div className='flex flex-wrap gap-2'>
+                        {data.subcategoryImages.map((image, index) => (
+                            <div key={index} className='relative'>
+                                <img src={image} alt={`Subcategory ${index}`} className='w-16 h-16 object-cover rounded' />
+                            </div>
+                        ))}
                     </div>
-                    <div className="flex flex-col">
-                        <label className='font-medium mb-1'>Subcategory Name:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={data.name}
-                            onChange={handleChange}
-                            placeholder="Subcategory Name"
-                            className='p-2 border rounded'
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label className='font-medium mb-1'>Upload Subcategory Image:</label>
-                        <input
-                            type="file"
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className='p-2 border rounded'
-                        />
-                    </div>
+
                     <button
                         type="submit"
                         className={`w-full py-2 text-white rounded ${loading ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-600"}`}
