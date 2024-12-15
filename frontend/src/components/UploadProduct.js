@@ -8,19 +8,20 @@ import SummaryApi from '../common';
 const UploadProduct = ({ onClose, fetchData }) => {
   const [data, setData] = useState({
     productName: "",
-    brandName: "", // Optional field
+    brandName: "",
     categoryId: "",
     subcategoryId: "",
-    productImage: [],
+    productImage: [], // Array for product images
     description: "",
     price: "",
-    quantityOptions: []
+    quantityOptions: [] // Array for quantity options
   });
 
   const [quantityOption, setQuantityOption] = useState({ quantity: '', price: '' });
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
 
+  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -40,6 +41,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
     fetchCategories();
   }, []);
 
+  // Handle category change and fetch subcategories
   const handleCategoryChange = (e) => {
     const categoryId = e.target.value;
     setData((prev) => ({
@@ -51,6 +53,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
     setSubCategories(selectedCategory?.subCategories || []);
   };
 
+  // Handle input change for the form
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setData(prev => ({
@@ -59,6 +62,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
     }));
   };
 
+  // Handle product image upload
   const handleUploadProduct = async (e) => {
     const file = e.target.files[0];
     const uploadImageCloudinary = await uploadImage(file);
@@ -68,6 +72,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
     }));
   };
 
+  // Handle product image deletion
   const handleDeleteProductImage = async (index) => {
     const newProductImage = [...data.productImage];
     newProductImage.splice(index, 1);
@@ -77,11 +82,13 @@ const UploadProduct = ({ onClose, fetchData }) => {
     }));
   };
 
+  // Handle quantity option change
   const handleQuantityOptionChange = (e) => {
     const { name, value } = e.target;
     setQuantityOption(prev => ({ ...prev, [name]: value }));
   };
 
+  // Add quantity option to the list
   const handleAddQuantityOption = () => {
     if (quantityOption.quantity && quantityOption.price) {
       setData(prev => ({
@@ -94,6 +101,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const productData = { ...data };
@@ -135,54 +143,55 @@ const UploadProduct = ({ onClose, fetchData }) => {
           <label htmlFor='brandName' className='mt-3'>Brand Name:</label>
           <input type="text" name='brandName' value={data.brandName} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
 
-          <label htmlFor='categoryId'>Category:</label>
-          <select name='categoryId' value={data.categoryId} onChange={handleCategoryChange} className='p-2 bg-slate-100 border rounded'>
-            <option value=''>Select a category</option>
+          <label htmlFor='category' className='mt-3'>Category:</label>
+          <select required value={data.categoryId} name='categoryId' onChange={handleCategoryChange} className='p-2 bg-slate-100 border rounded'>
+            <option value="">Select Category</option>
             {categories.map(category => (
-              <option key={category._id} value={category._id}>{category.categoryName}</option>
+              <option key={category._id} value={category._id}>{category.name}</option>
             ))}
           </select>
 
-          <label htmlFor='subcategoryId'>Subcategory:</label>
-          <select name='subcategoryId' value={data.subcategoryId} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'>
-            <option value=''>Select a subcategory</option>
-            {subCategories.map(subCategory => (
-              <option key={subCategory._id} value={subCategory._id}>{subCategory.subCategoryName}</option>
+          <label htmlFor='subcategoryId' className='mt-3'>Subcategory:</label>
+          <select required value={data.subcategoryId} name='subcategoryId' onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'>
+            <option value="">Select Subcategory</option>
+            {subCategories.map(subcat => (
+              <option key={subcat._id} value={subcat._id}>{subcat.name}</option>
             ))}
           </select>
 
-          <label htmlFor='description'>Description:</label>
-          <textarea name='description' value={data.description} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'></textarea>
+          <label htmlFor='description' className='mt-3'>Description:</label>
+          <textarea required name='description' value={data.description} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'></textarea>
 
-          <label htmlFor='price'>Price:</label>
+          <label htmlFor='price' className='mt-3'>Price (MRP):</label>
           <input required type="number" name='price' value={data.price} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
 
-          <label htmlFor='productImage'>Product Images:</label>
-          <input type="file" onChange={handleUploadProduct} className='p-2 bg-slate-100 border rounded' />
+          <label htmlFor='quantityOption' className='mt-3'>Quantity Options:</label>
           <div className='flex gap-2'>
-            {data.productImage.map((image, index) => (
+            <input name='quantity' placeholder="Quantity" value={quantityOption.quantity} onChange={handleQuantityOptionChange} className='p-2 bg-slate-100 border rounded' />
+            <input type="number" name='price' placeholder="Price" value={quantityOption.price} onChange={handleQuantityOptionChange} className='p-2 bg-slate-100 border rounded' />
+            <button type="button" onClick={handleAddQuantityOption} className='px-3 py-2 bg-blue-500 text-white rounded'>Add</button>
+          </div>
+
+          <ul>
+            {data.quantityOptions.map((option, index) => (
+              <li key={index}>Quantity: {option.quantity}, Price: {option.price}</li>
+            ))}
+          </ul>
+
+          <label htmlFor='productImage' className='mt-3'>Product Image:</label>
+          <input type="file" onChange={handleUploadProduct} className='p-2 bg-slate-100 border rounded' />
+          <div className='flex flex-wrap gap-2'>
+            {data.productImage.map((imgUrl, index) => (
               <div key={index} className='relative'>
-                <img src={image} alt={`Product ${index}`} className='w-16 h-16 object-cover rounded' />
-                <button type='button' onClick={() => handleDeleteProductImage(index)} className='absolute top-0 right-0 text-red-500'>
+                <img src={imgUrl} alt="Product" className='w-20 h-20 object-cover' />
+                <button type="button" className='absolute top-0 right-0 text-red-500 hover:text-red-600' onClick={() => handleDeleteProductImage(index)}>
                   <MdDelete />
                 </button>
               </div>
             ))}
           </div>
 
-          <label htmlFor='quantityOptions'>Quantity Options:</label>
-          <div className='flex gap-2'>
-            <input type="number" name='quantity' value={quantityOption.quantity} onChange={handleQuantityOptionChange} placeholder='Quantity' className='p-2 bg-slate-100 border rounded' />
-            <input type="number" name='price' value={quantityOption.price} onChange={handleQuantityOptionChange} placeholder='Price' className='p-2 bg-slate-100 border rounded' />
-            <button type='button' onClick={handleAddQuantityOption} className='bg-blue-500 text-white px-3 py-2 rounded'>Add</button>
-          </div>
-          <ul>
-            {data.quantityOptions.map((option, index) => (
-              <li key={index}>{option.quantity} units - ${option.price}</li>
-            ))}
-          </ul>
-
-          <button type='submit' className='bg-green-500 text-white px-3 py-2 rounded'>Upload Product</button>
+          <button className='px-3 py-2 bg-green-600 text-white mb-10 hover:bg-green-700 rounded-full'>Upload Product</button>
         </form>
       </div>
     </div>
