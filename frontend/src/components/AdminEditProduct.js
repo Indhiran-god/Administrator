@@ -193,7 +193,6 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         name='brandName'
                         onChange={handleOnChange}
                         className='p-2 bg-slate-100 border rounded'
-                        required
                     />
 
                     {/* Category */}
