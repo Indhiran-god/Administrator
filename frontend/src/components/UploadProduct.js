@@ -173,8 +173,8 @@ const UploadProduct = ({ onClose, fetchData }) => {
             className='p-2 bg-slate-100 border rounded'>
           </textarea>
 
-          <label htmlFor='price' className='mt-3'>Price (MRP):</label>
-          <input required type="number" name='price' value={data.price} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
+          <label htmlFor='price(MRP-optional)' className='mt-3'>Price (MRP):</label>
+          <input type="number" name='price' value={data.price} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
 
           <label htmlFor='quantityOption' className='mt-3'>Quantity Options:</label>
           <div className='flex gap-2'>
