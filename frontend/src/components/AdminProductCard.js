@@ -58,9 +58,11 @@ const AdminProductCard = ({ data, fetchdata }) => {
                 <h1 className='text-ellipsis line-clamp-2'>{data.productName}</h1>
                 <div>
                     {/* Display the base price (MRP) with a strike-through */}
-                    <div className='text-red-500 line-through'>
-                        <p className='font-semibold'>{displayINRCurrency(data.price)}</p>
-                    </div>
+                    {data.price && (
+                        <div className='text-red-500 line-through'>
+                            <p className='font-semibold'>{displayINRCurrency(data.price)}</p>
+                        </div>
+                    )}
                     
                     {/* Quantity Dropdown */}
                     {data.quantityOptions && data.quantityOptions.length > 0 && (
@@ -82,7 +84,7 @@ const AdminProductCard = ({ data, fetchdata }) => {
                     )}
 
                     {/* Display the discounted price for the selected quantity */}
-                    {selectedQuantity && selectedOption && (
+                    {selectedQuantity && selectedOption?.price && (
                         <div className='mt-2'>
                             <p className='font-semibold text-green-500'>
                                 Price for {selectedQuantity} items: {displayINRCurrency(selectedOption.price)}
@@ -114,3 +116,4 @@ const AdminProductCard = ({ data, fetchdata }) => {
 };
 
 export default AdminProductCard;
+
