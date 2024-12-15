@@ -8,11 +8,11 @@ import SummaryApi from '../common';
 const UploadProduct = ({ onClose, fetchData }) => {
   const [data, setData] = useState({
     productName: "",
-    brandName: "",
+    brandName: "", // Optional
     categoryId: "",
     subcategoryId: "",
     productImage: [], // Array for product images
-    description: "",
+    description: "", // Optional
     price: "",
     quantityOptions: [] // Array for quantity options
   });
@@ -140,8 +140,14 @@ const UploadProduct = ({ onClose, fetchData }) => {
           <label htmlFor='productName' className='mt-3'>Product Name:</label>
           <input required type="text" name='productName' value={data.productName} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
 
-          <label htmlFor='brandName' className='mt-3'>Brand Name:</label>
-          <input type="text" name='brandName' value={data.brandName} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
+          <label htmlFor='brandName' className='mt-3'>Brand Name (Optional):</label>
+          <input 
+            type="text" 
+            name='brandName' 
+            value={data.brandName} 
+            onChange={handleOnChange} 
+            className='p-2 bg-slate-100 border rounded' 
+          />
 
           <label htmlFor='category' className='mt-3'>Category:</label>
           <select required value={data.categoryId} name='categoryId' onChange={handleCategoryChange} className='p-2 bg-slate-100 border rounded'>
@@ -159,8 +165,13 @@ const UploadProduct = ({ onClose, fetchData }) => {
             ))}
           </select>
 
-          <label htmlFor='description' className='mt-3'>Description:</label>
-          <textarea required name='description' value={data.description} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded'></textarea>
+          <label htmlFor='description' className='mt-3'>Description (Optional):</label>
+          <textarea 
+            name='description' 
+            value={data.description} 
+            onChange={handleOnChange} 
+            className='p-2 bg-slate-100 border rounded'>
+          </textarea>
 
           <label htmlFor='price' className='mt-3'>Price (MRP):</label>
           <input required type="number" name='price' value={data.price} onChange={handleOnChange} className='p-2 bg-slate-100 border rounded' />
