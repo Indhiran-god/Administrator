@@ -300,7 +300,7 @@ const AdminEditProduct = ({ onClose, productData, fetchdata }) => {
                         name='price'
                         onChange={handleOnChange}
                         className='p-2 bg-slate-100 border rounded'
-                        required
+                        
                     />
 
                     {/* Description */}
