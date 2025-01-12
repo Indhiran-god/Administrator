@@ -118,8 +118,8 @@ const AdminEditSubcategory = ({ onClose, subcategoryData, fetchdata }) => {
     };
 
     return (
-        <div className='fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 flex justify-center items-center'>
-            <div className='bg-white p-4 rounded w-full max-w-2xl'>
+        <div className='fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 flex justify-center items-center z-50'>
+            <div className='bg-white p-4 rounded w-full max-w-2xl z-60'>
                 <div className='flex justify-between items-center pb-3'>
                     <h2 className='font-bold text-lg'>Edit Subcategory</h2>
                     <button onClick={onClose} className='text-2xl hover:text-red-600'>
@@ -185,3 +185,4 @@ const AdminEditSubcategory = ({ onClose, subcategoryData, fetchdata }) => {
 };
 
 export default AdminEditSubcategory;
+
